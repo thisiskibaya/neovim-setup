@@ -787,6 +787,7 @@ do
     },
     -- You can also specify external formatters in here.
     formatters_by_ft = {
+      lua  = { 'stylua' },
       cpp  = { 'clang-format' },
       c    = { 'clang-format' },
       rust = { 'rustfmt' },
