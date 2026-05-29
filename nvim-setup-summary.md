@@ -150,12 +150,14 @@ AI-assisted coding via `lua/custom/plugins/ai.lua` using GitHub Copilot as the a
 | Neovim >= 0.10.0 | Runtime | ✅ v0.12.2 |
 | Treesitter parsers | Chat buffer syntax highlighting | ✅ Installed |
 | `plenary.nvim` | Async I/O, utilities | Auto-installed by `ai.lua` |
-| GitHub CLI (`gh`) | Copilot auth | ✅ Authenticated as `thisiskibaya` |
+| `copilot.lua` | Copilot auth & API bridge | Auto-installed by `ai.lua` |
 
 ### First-Time Setup
 
 ```vim
-:lua vim.pack.update()        " Install CodeCompanion + plenary.nvim
+:lua vim.pack.update()        " Install CodeCompanion + copilot.lua + plenary.nvim
+:lua vim.cmd.packadd('copilot.lua')  " Load copilot.lua into runtime
+:Copilot auth                  " Authorize Copilot (opens browser)
 :checkhealth codecompanion    " Verify everything is ready
 ```
 

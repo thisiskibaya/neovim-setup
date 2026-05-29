@@ -474,9 +474,9 @@ CodeCompanion requires the following to be installed at the Neovim level:
 | Neovim >= 0.10.0 | Runtime requirement | System (v0.12.2 ✅) |
 | Treesitter parsers | Syntax highlighting in chat buffers | `nvim-treesitter` (already installed) |
 | `plenary.nvim` | Async I/O, Lua utility functions | `vim.pack.add` in `ai.lua` |
-| GitHub CLI (`gh`) | Copilot authentication | System (already authenticated ✅) |
+| `copilot.lua` | Copilot authentication & API bridge | `vim.pack.add` in `ai.lua` |
 
-**Zero API keys required.** CodeCompanion's Copilot adapter authenticates through your GitHub CLI session — no tokens to configure, no environment variables to set.
+**Zero API keys required.** CodeCompanion's Copilot adapter delegates to `copilot.lua` for authentication, which connects via your GitHub CLI session.
 
 ### Implementation
 
@@ -510,6 +510,7 @@ require('codecompanion').setup {
 | Plugin | Purpose | vim.pack Add |
 |---|---|---|
 | `olimorris/codecompanion.nvim` | AI chat, inline transformations, agentic tools | ✅ |
+| `zbirenbaum/copilot.lua` | Copilot auth & API bridge (required by CodeCompanion's copilot adapter) | ✅ |
 | `nvim-lua/plenary.nvim` | Async I/O and utility library (dependency) | ✅ |
 
 ### Features
@@ -579,18 +580,19 @@ This is the fastest way to refactor small-to-medium chunks without leaving your 
 
 ### First-Time Setup
 
-```bash
-# 1. Install plugins (run inside Neovim)
+```vim
+" 1. Install plugins
 :lua vim.pack.update()
+:lua vim.cmd.packadd('copilot.lua')
 
-# 2. Verify Copilot auth
-gh auth status
+" 2. Authenticate Copilot (opens browser)
+:Copilot auth
 
-# 3. Verify CodeCompanion health
+" 3. Verify
 :checkhealth codecompanion
 ```
 
-On first use, CodeCompanion's Copilot adapter will request a Copilot API token via your GitHub CLI session. This happens automatically — no manual steps required.
+On first use, `:Copilot auth` will open your browser to authorize GitHub Copilot. After that, CodeCompanion's copilot adapter will work using the same auth token.
 
 ### Troubleshooting
 
@@ -598,7 +600,8 @@ On first use, CodeCompanion's Copilot adapter will request a Copilot API token v
 |---|---|---|
 | `checkhealth` shows "plenary.nvim not found" | Plenary not installed | Run `:lua vim.pack.update()` again |
 | Chat returns "No adapter configured" | Copilot adapter missing | Verify `strategies.chat.adapter = 'copilot'` in `ai.lua` |
-| "GitHub CLI not authenticated" | `gh` not logged in | Run `gh auth login` in terminal |
+| "Failed to set up adapter" | `copilot.lua` not installed or not authenticated | Run `vim.pack.update()`, then `:Copilot auth` |
+| Copilot auth not working | `gh` not logged in or no Copilot subscription | Run `gh auth login` and verify Copilot is enabled at github.com/settings/copilot |
 | Inline transformation hangs | Large selection or slow network | Select a smaller region and try again |
 | `@` completion not showing | blink.cmp not configured for codecompanion | Ensure blink.cmp sources include `codecompanion` (should work out of the box with blink.cmp >= 1.x)
 
