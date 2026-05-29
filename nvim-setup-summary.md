@@ -114,6 +114,7 @@ Filetype-to-formatter mapping in `init.lua`:
 | `rust` | `rustfmt` |
 | `go` | `gofmt` |
 | `lua` | `stylua` |
+| `lua` | `stylua` |
 | `javascript`, `typescript`, `typescriptreact`, `javascriptreact` | `prettier` |
 | `json`, `html`, `css` | `prettier` |
 
@@ -136,6 +137,26 @@ Async linters run automatically on every save via `lua/custom/plugins/lint.lua`:
 
 ---
 
+## Agentic AI (CodeCompanion + Copilot)
+
+AI-assisted coding via `lua/custom/plugins/ai.lua` using GitHub Copilot as the adapter (zero API keys — reuses your existing GitHub auth).
+
+### Features
+
+- **Chat buffer** — ask questions, refactor, explain code, generate tests
+- **Inline transformations** (`ga` in visual mode) — select code, describe the change, apply the diff
+- **Action palette** (`<leader>ce`) — built-in prompts: fix LSP errors, explain code, add docstrings
+- **Agent tools** — `@run_command` (run terminal commands), `@files` (read/write files), `@insert_edit_into_file`
+- **blink.cmp integration** — `@` completion in chat for context, tools, and slash commands
+
+### How to Use
+
+1. `<leader>cc` — open chat buffer, type questions or use `@` to tag context
+2. Visual select + `ga` — describe a code change, review diff, accept/reject
+3. `<leader>ce` — action palette for common AI tasks
+
+---
+
 ## Keymaps
 
 | Shortcut | Action |
@@ -152,6 +173,10 @@ Async linters run automatically on every save via `lua/custom/plugins/lint.lua`:
 | `gra` | LSP code action |
 | `<leader>q` | Open diagnostics list |
 | `<C-h/j/k/l>` | Window navigation |
+| `<leader>cc` | Open AI chat | CodeCompanion |
+| `<leader>cC` | Open AI chat (vertical split) | CodeCompanion |
+| `ga` | Inline AI transformation (visual mode) | CodeCompanion |
+| `<leader>ce` | AI action palette | CodeCompanion |
 
 ---
 
@@ -166,6 +191,9 @@ Key modifications from upstream kickstart (all in `init.lua`):
 2. Added `clang-format` and `prettier` to Mason `ensure_installed`
 3. Replaced `formatters_by_ft` with C++, Rust, Go, JS/TS formatter mappings
 4. Added `cpp`, `rust`, `go`, `javascript`, `typescript`, `tsx`, `json` to treesitter parsers
+5. Added `lua = { 'stylua' }` to conform formatters (Lua formatting)
+6. Added `eslint_d` to linters with `eslint.config.js` at repo root (zero npm deps)
+7. Added CodeCompanion.nvim with Copilot adapter for agentic AI (`lua/custom/plugins/ai.lua`)
 
 ## Nerd Font — Icons & Glyphs
 

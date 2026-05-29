@@ -459,6 +459,51 @@ Both are active. Use whichever feels natural.
 
 ---
 
+## Phase 8 — Agentic AI
+
+**Status**: ✅ Implemented
+
+**Goal**: AI-assisted coding with chat, inline transformations, and agentic tools — using GitHub Copilot via CodeCompanion.
+
+### Implementation
+
+Created `~/.config/nvim/lua/custom/plugins/ai.lua`.  
+Uses GitHub Copilot as the LLM adapter (zero API keys — reuses your existing GitHub auth).
+
+### Plugins Installed
+
+| Plugin | Purpose | vim.pack Add |
+|---|---|---|
+| `olimorris/codecompanion.nvim` | AI chat, inline transformations, agentic tools | ✅ |
+| `nvim-lua/plenary.nvim` | Dependency for CodeCompanion | ✅ |
+
+### Features
+
+- **Chat buffer** (`<leader>cc`) — ask questions, refactor, explain code, generate tests
+- **Inline transformations** (`ga` in visual mode) — select code, describe the change, apply the diff
+- **Action palette** (`<leader>ce`) — built-in prompts: fix LSP errors, explain code, add docstrings
+- **Agent tools** — `@run_command` (execute terminal commands), `@files` (read/write project files), `@insert_edit_into_file`
+- **MCP support** — plug into external MCP servers for custom tools
+- **blink.cmp integration** — `@` completion in chat for context, tools, and slash commands
+
+### Keymaps
+
+| Shortcut | Action | Mode |
+|---|---|---|
+| `<leader>cc` | Open chat buffer | Normal, Visual |
+| `<leader>cC` | Open chat in vertical split | Normal, Visual |
+| `ga` | Inline transformation | Visual |
+| `<leader>ce` | Action palette | Normal |
+
+### How to Use
+
+1. **Chat**: `<leader>cc` opens a right-side chat buffer. Type your question or use `@` to tag files, tools, or context.
+2. **Inline**: Select code with `V` or `v`, then press `ga` and describe the change. Review the diff, accept or reject.
+3. **Actions**: `<leader>ce` opens the action palette — pick "Explain code", "Add docstrings", "Fix LSP diagnostics", etc.
+4. **Tools**: In chat, type `@run_command` to let the AI run terminal commands, or `@files` to read/write files.
+
+---
+
 ## Recommended Implementation Order
 
 ```
@@ -467,8 +512,9 @@ Both are active. Use whichever feels natural.
 ✅ Phase 3  →  Git                    (neogit, diffview)
 ✅ Phase 4  →  Code Quality           (linters, trouble)
 ✅ Phase 5  →  Language-specific      (CMake, crates, go.nvim)
-✅ Phase 6  →  Productivity           (snippets, autopairs, AI)
-⬜ Phase 7  →  Polish                 (noice, dressing, colorizer)
+✅ Phase 6  →  Productivity           (snippets, autopairs)
+✅ Phase 7  →  Polish                 (noice, dressing, colorizer)
+✅ Phase 8  →  Agentic AI             (CodeCompanion + Copilot)
 ```
 
 ---
@@ -494,7 +540,8 @@ As phases accumulate, split `init.lua` into a modular structure:
         ├── lang-rust.lua     ← Phase 5 ✅
         ├── lang-go.lua       ← Phase 5 ✅
         ├── lang-ts.lua       ← Phase 5 ⬜ (optional)
-        └── productivity.lua  ← Phase 6 ✅
+        ├── productivity.lua  ← Phase 6 ✅
+        └── ai.lua            ← Phase 8 ✅ (Agentic AI)
 ```
 
 Each plugin file calls `vim.pack.add(...)` followed by `.setup()`.  
