@@ -1,8 +1,4 @@
--- Phase 8: Agentic AI — CodeCompanion with GitHub Models adapter
---
--- Uses the `github_models` adapter which authenticates via `gh` CLI.
--- No copilot.lua needed — works with your existing GitHub auth.
--- Provides access to GPT-4o, GPT-4.1, and other models via GitHub's API.
+-- Phase 8: Agentic AI — CodeCompanion with Copilot adapter
 
 local function gh(repo) return 'https://github.com/' .. repo end
 
@@ -13,8 +9,8 @@ vim.pack.add {
 
 require('codecompanion').setup {
   strategies = {
-    chat = { adapter = 'github_models' },
-    inline = { adapter = 'github_models' },
+    chat = { adapter = 'copilot' },
+    inline = { adapter = 'copilot' },
   },
   display = {
     chat = {

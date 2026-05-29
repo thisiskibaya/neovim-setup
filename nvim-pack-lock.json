@@ -18,17 +18,9 @@
       "rev": "f9a3eb2be0b8148df470244e5c25aede3a3a28a5",
       "src": "https://github.com/Civitasv/cmake-tools.nvim"
     },
-    "codecompanion.nvim": {
-      "rev": "57989aca2e92083b16a2500ad47f285d82d5c43b",
-      "src": "https://github.com/olimorris/codecompanion.nvim"
-    },
     "conform.nvim": {
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
       "src": "https://github.com/stevearc/conform.nvim"
-    },
-    "copilot.lua": {
-      "rev": "e8b9be2e51c393bedc893cef3bd1c5555a4d45f5",
-      "src": "https://github.com/zbirenbaum/copilot.lua"
     },
     "crates.nvim": {
       "rev": "694357861ec9ebf12475ddcdd04ea45a0923c32d",

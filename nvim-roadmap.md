@@ -463,142 +463,44 @@ Both are active. Use whichever feels natural.
 
 **Status**: ✅ Implemented
 
-**Goal**: AI-assisted coding with chat, inline transformations, and agentic tools — using GitHub Models API via CodeCompanion.
-
-### Dependencies
-
-CodeCompanion requires the following to be installed at the Neovim level:
-
-| Dependency | Role | Installed By |
-|---|---|---|
-| Neovim >= 0.10.0 | Runtime requirement | System (v0.12.2 ✅) |
-| Treesitter parsers | Syntax highlighting in chat buffers | `nvim-treesitter` (already installed) |
-| `plenary.nvim` | Async I/O, Lua utility functions | `vim.pack.add` in `ai.lua` |
-| GitHub CLI (`gh`) | Authentication for GitHub Models API | System (already authenticated ✅) |
-
-**Zero API keys required.** The GitHub Models adapter authenticates via your existing `gh` CLI session — no tokens or additional plugins needed.
+**Goal**: AI-assisted coding with chat, inline transformations, and agentic tools — using GitHub Copilot via CodeCompanion.
 
 ### Implementation
 
 Created `~/.config/nvim/lua/custom/plugins/ai.lua`.  
-Auto-loaded via `lua/custom/plugins/init.lua` (the kickstart module loader).
-
-Full configuration:
-
-```lua
-require('codecompanion').setup {
-  strategies = {
-    chat = { adapter = 'github_models' },    -- Uses gh CLI auth
-    inline = { adapter = 'github_models' },  -- Uses gh CLI auth
-  },
-  display = {
-    chat = {
-      window = {
-        layout = 'vertical',   -- Right sidebar
-        width = 0.4,           -- 40% of editor width
-      },
-    },
-  },
-  opts = {
-    log_level = 'INFO',
-  },
-}
-```
+Uses GitHub Copilot as the LLM adapter (zero API keys — reuses your existing GitHub auth).
 
 ### Plugins Installed
 
 | Plugin | Purpose | vim.pack Add |
 |---|---|---|
 | `olimorris/codecompanion.nvim` | AI chat, inline transformations, agentic tools | ✅ |
-| `nvim-lua/plenary.nvim` | Async I/O and utility library (dependency) | ✅ |
+| `nvim-lua/plenary.nvim` | Dependency for CodeCompanion | ✅ |
 
 ### Features
 
-| Feature | Trigger | Description |
-|---|---|---|
-| **Chat buffer** | `<leader>cc` | Right-side chat panel. Ask questions, request refactors, generate code, or debug with full project context. |
-| **Inline transformation** | `ga` (visual) | Select code, press `ga`, describe the change. Result appears as a diff — accept with `<C-y>` or reject. |
-| **Action palette** | `<leader>ce` | Pre-built prompts: explain code, add docstrings, fix LSP diagnostics, write tests, and more. |
-| **Agent tools** | `@` in chat | Tag tools inline: `@run_command` (execute shell commands), `@files` (read/write files), `@insert_edit_into_file`. |
-| **Editor context** | `@` in chat | Inject context: `@buffer` (current buffer), `@lsp` (LSP diagnostics), `@problems` (all diagnostics). |
-| **blink.cmp source** | `@` autocomplete | Autocomplete for tools, slash commands, and context tags in the chat buffer. |
-| **MCP servers** | Config | Connect external MCP servers for custom tools (e.g., database queries, API calls). |
+- **Chat buffer** (`<leader>cc`) — ask questions, refactor, explain code, generate tests
+- **Inline transformations** (`ga` in visual mode) — select code, describe the change, apply the diff
+- **Action palette** (`<leader>ce`) — built-in prompts: fix LSP errors, explain code, add docstrings
+- **Agent tools** — `@run_command` (execute terminal commands), `@files` (read/write project files), `@insert_edit_into_file`
+- **MCP support** — plug into external MCP servers for custom tools
+- **blink.cmp integration** — `@` completion in chat for context, tools, and slash commands
 
 ### Keymaps
 
 | Shortcut | Action | Mode |
 |---|---|---|
-| `<leader>cc` | Open chat buffer (right sidebar) | Normal, Visual |
+| `<leader>cc` | Open chat buffer | Normal, Visual |
 | `<leader>cC` | Open chat in vertical split | Normal, Visual |
-| `ga` | Inline AI transformation | Visual |
-| `<leader>ce` | Open action palette | Normal |
+| `ga` | Inline transformation | Visual |
+| `<leader>ce` | Action palette | Normal |
 
-### Usage Workflows
+### How to Use
 
-#### 1. Chat (`<leader>cc`)
-
-1. Press `<leader>cc` — a right-side chat buffer opens
-2. Type a question or request, e.g. "explain this function" or "write a test for this module"
-3. Use `@` to tag context and tools:
-   - `@buffer` — includes the current buffer content
-   - `@lsp` — includes LSP diagnostics for the current file
-   - `@problems` — includes all workspace diagnostics
-   - `@files` — lets the AI read/write project files
-   - `@run_command` — lets the AI run terminal commands (with your approval)
-4. Press `<C-Enter>` to send the message
-5. Navigate responses with `[[` and `]]`
-6. Copy code blocks with `gy`
-7. Close with `q`
-
-**Example**: Open a TypeScript file, press `<leader>cc`, then type:
-
-```
-Add error handling to @buffer, then write a test for it
-```
-
-#### 2. Inline Transformation (`ga`)
-
-1. Select code with `V` (line) or `v` (character)
-2. Press `ga`
-3. Type a transformation, e.g. "convert to async/await" or "add null checks"
-4. Press `<C-Enter>`
-5. Review the diff — accept (`<C-y>`) or reject (`<C-x>`)
-
-This is the fastest way to refactor small-to-medium chunks without leaving your buffer.
-
-#### 3. Action Palette (`<leader>ce`)
-
-1. Press `<leader>ce` to open a Telescope-style picker
-2. Select from built-in actions:
-   - **Explain code** — detailed explanation of the current selection
-   - **Add docstrings** — generate doc comments
-   - **Fix LSP diagnostics** — ask the AI to fix visible errors
-   - **Write tests** — generate tests for the current buffer
-   - **Optimize code** — suggest performance improvements
-3. Press `<CR>` to execute
-
-### First-Time Setup
-
-```vim
-" 1. Install plugins
-:lua vim.pack.update()
-
-" 2. Verify
-:checkhealth codecompanion
-```
-
-No additional auth steps needed — the `github_models` adapter uses your existing `gh` CLI session automatically.
-
-### Troubleshooting
-
-| Symptom | Likely Cause | Fix |
-|---|---|---|
-| `checkhealth` shows "plenary.nvim not found" | Plenary not installed | Run `:lua vim.pack.update()` again |
-| Chat returns "No adapter configured" | Copilot adapter missing | Verify `strategies.chat.adapter = 'copilot'` in `ai.lua` |
-| "Failed to set up adapter" | `github_models` adapter not resolving | Verify `gh auth status` shows active session |
-| No models available | `gh` not authenticated or token lacks scope | Run `gh auth login` with `repo`, `read:org`, `user` scopes |
-| Inline transformation hangs | Large selection or slow network | Select a smaller region and try again |
-| `@` completion not showing | blink.cmp not configured for codecompanion | Ensure blink.cmp sources include `codecompanion` (should work out of the box with blink.cmp >= 1.x)
+1. **Chat**: `<leader>cc` opens a right-side chat buffer. Type your question or use `@` to tag files, tools, or context.
+2. **Inline**: Select code with `V` or `v`, then press `ga` and describe the change. Review the diff, accept or reject.
+3. **Actions**: `<leader>ce` opens the action palette — pick "Explain code", "Add docstrings", "Fix LSP diagnostics", etc.
+4. **Tools**: In chat, type `@run_command` to let the AI run terminal commands, or `@files` to read/write files.
 
 ---
 
@@ -612,7 +514,7 @@ No additional auth steps needed — the `github_models` adapter uses your existi
 ✅ Phase 5  →  Language-specific      (CMake, crates, go.nvim)
 ✅ Phase 6  →  Productivity           (snippets, autopairs)
 ✅ Phase 7  →  Polish                 (noice, dressing, colorizer)
-✅ Phase 8  →  Agentic AI             (CodeCompanion + GitHub Models)
+✅ Phase 8  →  Agentic AI             (CodeCompanion + Copilot)
 ```
 
 ---
