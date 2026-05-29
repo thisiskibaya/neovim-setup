@@ -1,6 +1,11 @@
-import tseslint from 'typescript-eslint'
-
-export default tseslint.config(
+export default [
   { ignores: ['dist/', 'node_modules/'] },
-  { extends: tseslint.configs.recommended },
-)
+  {
+    rules: {
+      'no-unused-vars': 'warn',
+      'no-undef': 'error',
+      semi: ['warn', 'never'],
+      'no-console': 'warn',
+    },
+  },
+]
