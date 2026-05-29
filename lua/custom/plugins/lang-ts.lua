@@ -1,0 +1,28 @@
+-- JavaScript / TypeScript: enhanced tsserver integration
+--
+-- typescript-tools.nvim is an alternative to ts_ls (the current LSP).
+-- It provides better project-wide actions and tsserver lifecycle management.
+-- To use it, swap `ts_ls` for `typescript-tools.nvim` in the servers list.
+--
+-- For now, ts_ls (installed via Mason) handles:
+--   - Go to definition, references, rename
+--   - Autocompletion
+--   - Diagnostics
+--   - Hover documentation
+--
+-- If you want more advanced features (organize imports, apply fixes in bulk,
+-- separate tsconfig handling), uncomment the plugin and config below,
+-- then remove `ts_ls = {}` from the servers list in init.lua.
+
+-- local function gh(repo) return 'https://github.com/' .. repo end
+--
+-- vim.pack.add { gh 'pmizio/typescript-tools.nvim' }
+--
+-- require('typescript-tools').setup {
+--   settings = {
+--     tsserver_plugins = {},
+--     separate_diagnostic_autocmds = true,
+--     publish_diagnostic_on = 'insert_leave',
+--     expose_as_code_action = 'all',
+--   },
+-- }

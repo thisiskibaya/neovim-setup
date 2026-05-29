@@ -1,0 +1,10 @@
+tags
+test.sh
+.luarc.json
+nvim
+
+spell/
+
+# nvim-pack-lock.json is tracked in this fork to lock plugin versions
+
+.DS_Store
