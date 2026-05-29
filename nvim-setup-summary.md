@@ -139,21 +139,43 @@ Async linters run automatically on every save via `lua/custom/plugins/lint.lua`:
 
 ## Agentic AI (CodeCompanion + Copilot)
 
-AI-assisted coding via `lua/custom/plugins/ai.lua` using GitHub Copilot as the adapter (zero API keys — reuses your existing GitHub auth).
+AI-assisted coding via `lua/custom/plugins/ai.lua` using GitHub Copilot as the adapter.
+
+**Zero API keys required** — CodeCompanion's Copilot adapter authenticates through your existing GitHub CLI session (`gh auth status`).
+
+### Dependencies
+
+| Dependency | Role | Status |
+|---|---|---|
+| Neovim >= 0.10.0 | Runtime | ✅ v0.12.2 |
+| Treesitter parsers | Chat buffer syntax highlighting | ✅ Installed |
+| `plenary.nvim` | Async I/O, utilities | Auto-installed by `ai.lua` |
+| GitHub CLI (`gh`) | Copilot auth | ✅ Authenticated as `thisiskibaya` |
+
+### First-Time Setup
+
+```vim
+:lua vim.pack.update()        " Install CodeCompanion + plenary.nvim
+:checkhealth codecompanion    " Verify everything is ready
+```
 
 ### Features
 
-- **Chat buffer** — ask questions, refactor, explain code, generate tests
-- **Inline transformations** (`ga` in visual mode) — select code, describe the change, apply the diff
-- **Action palette** (`<leader>ce`) — built-in prompts: fix LSP errors, explain code, add docstrings
-- **Agent tools** — `@run_command` (run terminal commands), `@files` (read/write files), `@insert_edit_into_file`
-- **blink.cmp integration** — `@` completion in chat for context, tools, and slash commands
+| Feature | Trigger | What it does |
+|---|---|---|
+| **Chat buffer** | `<leader>cc` | Right-side chat panel. Ask questions, refactor, generate code. Use `@` for context and tools. |
+| **Inline transformation** | `ga` (visual) | Select code, press `ga`, describe the change. Accept diff with `<C-y>`, reject with `<C-x>`. |
+| **Action palette** | `<leader>ce` | Built-in prompts: explain code, add docstrings, fix LSP errors, write tests. |
+| **Agent tools** | `@` in chat | `@run_command` (shell), `@files` (read/write), `@insert_edit_into_file` (apply edits). |
+| **Editor context** | `@` in chat | `@buffer` (current file), `@lsp` (diagnostics), `@problems` (workspace errors). |
 
-### How to Use
+### Quick Start
 
-1. `<leader>cc` — open chat buffer, type questions or use `@` to tag context
-2. Visual select + `ga` — describe a code change, review diff, accept/reject
-3. `<leader>ce` — action palette for common AI tasks
+1. Open a file, press `<leader>cc` to open chat
+2. Ask something like "explain this file" or "add error handling"
+3. Use `@` to include context — e.g. `@lsp` to let the AI see diagnostics
+4. Press `<C-Enter>` to send
+5. Press `q` to close the chat
 
 ---
 
