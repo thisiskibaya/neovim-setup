@@ -26,6 +26,10 @@
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
       "src": "https://github.com/stevearc/conform.nvim"
     },
+    "copilot.lua": {
+      "rev": "e8b9be2e51c393bedc893cef3bd1c5555a4d45f5",
+      "src": "https://github.com/zbirenbaum/copilot.lua"
+    },
     "crates.nvim": {
       "rev": "694357861ec9ebf12475ddcdd04ea45a0923c32d",
       "src": "https://github.com/saecki/crates.nvim"
