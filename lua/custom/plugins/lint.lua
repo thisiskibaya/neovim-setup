@@ -15,10 +15,10 @@ lint.linters_by_ft = {
   c    = { 'clang-tidy' },
   rust = { 'clippy' },
   go   = { 'staticcheck' },
-  javascript = { 'eslint' },
-  typescript = { 'eslint' },
-  typescriptreact = { 'eslint' },
-  javascriptreact = { 'eslint' },
+  javascript = { 'eslint_d' },
+  typescript = { 'eslint_d' },
+  typescriptreact = { 'eslint_d' },
+  javascriptreact = { 'eslint_d' },
 }
 
 vim.api.nvim_create_autocmd({ 'BufWritePost' }, {

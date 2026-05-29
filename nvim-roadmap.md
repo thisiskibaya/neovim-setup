@@ -296,7 +296,7 @@ Created `~/.config/nvim/lua/custom/plugins/lint.lua`.
 | `c`, `cpp` | `clang-tidy` | Symlinked from llvm-17 to `~/.local/bin` |
 | `rust` | `clippy` | Symlinked from rustup toolchain to `~/.local/bin` |
 | `go` | `staticcheck` | `go install` |
-| `javascript`, `typescript`, `typescriptreact`, `javascriptreact` | `eslint` | `npm install -g eslint` |
+| `javascript`, `typescript`, `typescriptreact`, `javascriptreact` | `eslint_d` | Mason (installed as `eslint_d`) |
 
 Linters run automatically on `BufWritePost` (every save).
 
