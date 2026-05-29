@@ -300,6 +300,8 @@ Created `~/.config/nvim/lua/custom/plugins/lint.lua`.
 
 Linters run automatically on `BufWritePost` (every save).
 
+**ESLint note**: `eslint.config.js` at the repo root uses only ESLint's built-in rules. `eslint_d` (installed via Mason) bundles its own eslint, so no project-level npm packages are needed for basic linting. The config applies to any JS/TS project opened with this Neovim config.
+
 ### Keymaps
 
 | Shortcut | Action | Plugin |

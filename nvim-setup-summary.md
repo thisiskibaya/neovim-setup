@@ -79,6 +79,7 @@ Mason's registry (https://github.com/mason-org/mason-registry) maps tool names t
 | `typescript-language-server` | LSP server | JavaScript, TypeScript | npm (vendored by Mason) |
 | `prettier` | Formatter | JS, TS, TSX, JSON, HTML, CSS | npm (vendored by Mason) |
 | `stylua` | Formatter | Lua | Pre-built binary |
+| `eslint_d` | Linter | JavaScript, TypeScript | npm (vendored by Mason) |
 
 ### Installed outside Mason
 
@@ -112,10 +113,26 @@ Filetype-to-formatter mapping in `init.lua`:
 | `c`, `cpp` | `clang-format` |
 | `rust` | `rustfmt` |
 | `go` | `gofmt` |
+| `lua` | `stylua` |
 | `javascript`, `typescript`, `typescriptreact`, `javascriptreact` | `prettier` |
 | `json`, `html`, `css` | `prettier` |
 
 Format on save: **disabled** (manual via `<leader>f`).
+
+---
+
+## Linting (nvim-lint)
+
+Async linters run automatically on every save via `lua/custom/plugins/lint.lua`:
+
+| Filetype(s) | Linter | Installed via |
+|---|---|---|
+| `c`, `cpp` | `clang-tidy` | System (symlinked from llvm-17) |
+| `rust` | `clippy` | rustup component |
+| `go` | `staticcheck` | `go install` |
+| `javascript`, `typescript`, `typescriptreact`, `javascriptreact` | `eslint_d` | Mason |
+
+**ESLint config** (`eslint.config.js` at repo root) uses only built-in ESLint rules — no project-level npm dependencies required. `eslint_d` from Mason bundles its own eslint, so it works out of the box on any JS/TS project.
 
 ---
 
