@@ -463,7 +463,7 @@ Both are active. Use whichever feels natural.
 
 **Status**: ✅ Implemented
 
-**Goal**: AI-assisted coding with chat, inline transformations, and agentic tools — using GitHub Copilot via CodeCompanion.
+**Goal**: AI-assisted coding with chat, inline transformations, and agentic tools — using GitHub Models API via CodeCompanion.
 
 ### Dependencies
 
@@ -474,9 +474,9 @@ CodeCompanion requires the following to be installed at the Neovim level:
 | Neovim >= 0.10.0 | Runtime requirement | System (v0.12.2 ✅) |
 | Treesitter parsers | Syntax highlighting in chat buffers | `nvim-treesitter` (already installed) |
 | `plenary.nvim` | Async I/O, Lua utility functions | `vim.pack.add` in `ai.lua` |
-| `copilot.lua` | Copilot authentication & API bridge | `vim.pack.add` in `ai.lua` |
+| GitHub CLI (`gh`) | Authentication for GitHub Models API | System (already authenticated ✅) |
 
-**Zero API keys required.** CodeCompanion's Copilot adapter delegates to `copilot.lua` for authentication, which connects via your GitHub CLI session.
+**Zero API keys required.** The GitHub Models adapter authenticates via your existing `gh` CLI session — no tokens or additional plugins needed.
 
 ### Implementation
 
@@ -488,8 +488,8 @@ Full configuration:
 ```lua
 require('codecompanion').setup {
   strategies = {
-    chat = { adapter = 'copilot' },    -- Use GH Copilot for chat
-    inline = { adapter = 'copilot' },  -- Use GH Copilot for inline edits
+    chat = { adapter = 'github_models' },    -- Uses gh CLI auth
+    inline = { adapter = 'github_models' },  -- Uses gh CLI auth
   },
   display = {
     chat = {
@@ -510,7 +510,6 @@ require('codecompanion').setup {
 | Plugin | Purpose | vim.pack Add |
 |---|---|---|
 | `olimorris/codecompanion.nvim` | AI chat, inline transformations, agentic tools | ✅ |
-| `zbirenbaum/copilot.lua` | Copilot auth & API bridge (required by CodeCompanion's copilot adapter) | ✅ |
 | `nvim-lua/plenary.nvim` | Async I/O and utility library (dependency) | ✅ |
 
 ### Features
@@ -583,16 +582,12 @@ This is the fastest way to refactor small-to-medium chunks without leaving your 
 ```vim
 " 1. Install plugins
 :lua vim.pack.update()
-:lua vim.cmd.packadd('copilot.lua')
 
-" 2. Authenticate Copilot (opens browser)
-:Copilot auth
-
-" 3. Verify
+" 2. Verify
 :checkhealth codecompanion
 ```
 
-On first use, `:Copilot auth` will open your browser to authorize GitHub Copilot. After that, CodeCompanion's copilot adapter will work using the same auth token.
+No additional auth steps needed — the `github_models` adapter uses your existing `gh` CLI session automatically.
 
 ### Troubleshooting
 
@@ -600,8 +595,8 @@ On first use, `:Copilot auth` will open your browser to authorize GitHub Copilot
 |---|---|---|
 | `checkhealth` shows "plenary.nvim not found" | Plenary not installed | Run `:lua vim.pack.update()` again |
 | Chat returns "No adapter configured" | Copilot adapter missing | Verify `strategies.chat.adapter = 'copilot'` in `ai.lua` |
-| "Failed to set up adapter" | `copilot.lua` not installed or not authenticated | Run `vim.pack.update()`, then `:Copilot auth` |
-| Copilot auth not working | `gh` not logged in or no Copilot subscription | Run `gh auth login` and verify Copilot is enabled at github.com/settings/copilot |
+| "Failed to set up adapter" | `github_models` adapter not resolving | Verify `gh auth status` shows active session |
+| No models available | `gh` not authenticated or token lacks scope | Run `gh auth login` with `repo`, `read:org`, `user` scopes |
 | Inline transformation hangs | Large selection or slow network | Select a smaller region and try again |
 | `@` completion not showing | blink.cmp not configured for codecompanion | Ensure blink.cmp sources include `codecompanion` (should work out of the box with blink.cmp >= 1.x)
 
@@ -617,7 +612,7 @@ On first use, `:Copilot auth` will open your browser to authorize GitHub Copilot
 ✅ Phase 5  →  Language-specific      (CMake, crates, go.nvim)
 ✅ Phase 6  →  Productivity           (snippets, autopairs)
 ✅ Phase 7  →  Polish                 (noice, dressing, colorizer)
-✅ Phase 8  →  Agentic AI             (CodeCompanion + Copilot)
+✅ Phase 8  →  Agentic AI             (CodeCompanion + GitHub Models)
 ```
 
 ---

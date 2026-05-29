@@ -1,26 +1,20 @@
--- Phase 8: Agentic AI — CodeCompanion with Copilot adapter
+-- Phase 8: Agentic AI — CodeCompanion with GitHub Models adapter
 --
--- Requires copilot.lua for Copilot authentication.
--- Inline suggestions are disabled — chat only.
+-- Uses the `github_models` adapter which authenticates via `gh` CLI.
+-- No copilot.lua needed — works with your existing GitHub auth.
+-- Provides access to GPT-4o, GPT-4.1, and other models via GitHub's API.
 
 local function gh(repo) return 'https://github.com/' .. repo end
 
 vim.pack.add {
   gh 'olimorris/codecompanion.nvim',
-  gh 'zbirenbaum/copilot.lua',
   gh 'nvim-lua/plenary.nvim',
-}
-
-vim.cmd.packadd 'copilot.lua'
-require('copilot').setup {
-  suggestion = { enabled = false },
-  panel = { enabled = false },
 }
 
 require('codecompanion').setup {
   strategies = {
-    chat = { adapter = 'copilot' },
-    inline = { adapter = 'copilot' },
+    chat = { adapter = 'github_models' },
+    inline = { adapter = 'github_models' },
   },
   display = {
     chat = {

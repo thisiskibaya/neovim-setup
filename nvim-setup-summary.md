@@ -137,11 +137,11 @@ Async linters run automatically on every save via `lua/custom/plugins/lint.lua`:
 
 ---
 
-## Agentic AI (CodeCompanion + Copilot)
+## Agentic AI (CodeCompanion + GitHub Models)
 
-AI-assisted coding via `lua/custom/plugins/ai.lua` using GitHub Copilot as the adapter.
+AI-assisted coding via `lua/custom/plugins/ai.lua` using the GitHub Models API adapter.
 
-**Zero API keys required** — CodeCompanion's Copilot adapter authenticates through your existing GitHub CLI session (`gh auth status`).
+**Zero API keys required** — the `github_models` adapter authenticates through your existing `gh` CLI session. No additional plugins needed.
 
 ### Dependencies
 
@@ -150,14 +150,12 @@ AI-assisted coding via `lua/custom/plugins/ai.lua` using GitHub Copilot as the a
 | Neovim >= 0.10.0 | Runtime | ✅ v0.12.2 |
 | Treesitter parsers | Chat buffer syntax highlighting | ✅ Installed |
 | `plenary.nvim` | Async I/O, utilities | Auto-installed by `ai.lua` |
-| `copilot.lua` | Copilot auth & API bridge | Auto-installed by `ai.lua` |
+| GitHub CLI (`gh`) | API authentication | ✅ Authenticated as `thisiskibaya` |
 
 ### First-Time Setup
 
 ```vim
-:lua vim.pack.update()        " Install CodeCompanion + copilot.lua + plenary.nvim
-:lua vim.cmd.packadd('copilot.lua')  " Load copilot.lua into runtime
-:Copilot auth                  " Authorize Copilot (opens browser)
+:lua vim.pack.update()        " Install CodeCompanion + plenary.nvim
 :checkhealth codecompanion    " Verify everything is ready
 ```
 
