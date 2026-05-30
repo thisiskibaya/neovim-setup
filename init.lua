@@ -976,5 +976,18 @@ do
   require 'custom.plugins'
 end
 
+-- Cursor restore: jump to last cursor position when reopening a file.
+-- Neovim maintains the '" mark automatically per-buffer across sessions.
+vim.api.nvim_create_autocmd('BufReadPost', {
+  desc = 'Restore cursor position when reopening files',
+  callback = function()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local lcount = vim.api.nvim_buf_line_count(0)
+    if mark[1] > 1 and mark[1] <= lcount then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
+})
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

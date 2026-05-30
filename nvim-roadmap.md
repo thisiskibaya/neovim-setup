@@ -688,6 +688,68 @@ Create a small Neovim Lua module or CLI script that bridges the gap:
 
 ---
 
+## Phase 10 — Window Persistence (Planned)
+
+**Status**: ⬜ Planned
+
+**Goal**: Auto-restore open files, window layout, cursor positions, and undo history on startup — replicating VS Code's "reopen where I left off" behavior.
+
+### Problem
+
+Currently, Neovim starts with a single empty buffer. Cursor position is restored per-file (via the `BufReadPost` autocmd in `init.lua`), but the session itself is not saved:
+
+- Open files, window splits, and tab pages are lost on quit
+- Undo history is lost unless `undofile` is on (it is by default in Neovim ≥ 0.12)
+- Manual `:mksession` workflow is tedious
+
+### Proposed Solution
+
+Add `folke/persistence.nvim` — a lightweight session manager that:
+
+- Auto-saves the current session on `:qa` / `VimLeavePre`
+- Auto-restores the last session on the next startup
+- Supports per-project sessions (optional)
+- Integrates with `nvim-lspconfig` to restart LSP clients on restore
+- ~1K stars, actively maintained, zero-config for basic use
+
+### Alternative: Built-in `:mksession`
+
+| Approach | Auto-save/restore | Per-project | LSP-aware | Maintenance |
+|---|---|---|---|---|
+| `persistence.nvim` | ✅ (on quit/start) | ✅ | ✅ | Plugin dep |
+| `:mksession` + autocmd | Needs manual setup | Manual | ❌ | Zero deps |
+
+`persistence.nvim` is preferred — the auto-save/restore workflow is the primary feature and requires no manual commands.
+
+### Implementation
+
+```lua
+-- lua/custom/plugins/session.lua
+vim.pack.add { gh 'folke/persistence.nvim' }
+require('persistence').setup {}
+```
+
+### Keymaps
+
+| Shortcut | Action |
+|---|---|
+| (auto) | Save session on `:qa` / Neovim close |
+| (auto) | Restore session on startup |
+| `:PersistenceLoad` | Manually load last session |
+| `:PersistenceSave` | Manually save session |
+
+### Config Organization
+
+A new `lua/custom/plugins/session.lua` file would be added under the plugins directory. When implemented, the config tree would look like:
+
+```
+└── plugins/
+    ...
+    └── session.lua        ← Phase 10 ✅ (Window Persistence)
+```
+
+---
+
 ## Recommended Implementation Order
 
 ```
@@ -700,7 +762,37 @@ Create a small Neovim Lua module or CLI script that bridges the gap:
 ✅ Phase 7  →  Polish                 (noice, dressing, colorizer)
 ✅ Phase 8  →  Agentic AI             (CodeCompanion + Copilot)
 ⬜ Phase 9  →  Auth Bridge            (automate token extraction auth.db → hosts.json)
+⬜ Phase 10 →  Window Persistence     (auto-restore files/layout on startup)
 ```
+
+---
+
+## Core Features
+
+### Autocmd: Cursor Restore on File Open
+
+Neovim's built-in `'"` mark automatically tracks the last cursor position for every buffer across sessions. The autocmd below opts in to restoring it when a file is reopened.
+
+```lua
+-- init.lua
+vim.api.nvim_create_autocmd('BufReadPost', {
+  desc = 'Restore cursor position when reopening files',
+  callback = function()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local lcount = vim.api.nvim_buf_line_count(0)
+    if mark[1] > 1 and mark[1] <= lcount then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
+})
+```
+
+**How it works:**
+1. On `BufReadPost` (fired after a file is read into a buffer), get the `'"` mark for the buffer
+2. Validate the mark is within the file's line range
+3. If valid, jump to that position with `nvim_win_set_cursor`
+
+No plugin, no mark plugin, no extra state. This is the standard Vim/Neovim approach and has been used for decades. The key difference from VS Code: this restores cursor position on a per-file basis when you reopen that specific file, not the entire workspace layout (see Phase 10 for that).
 
 ---
 
@@ -726,7 +818,8 @@ As phases accumulate, split `init.lua` into a modular structure:
         ├── lang-go.lua       ← Phase 5 ✅
         ├── lang-ts.lua       ← Phase 5 ⬜ (optional)
         ├── productivity.lua  ← Phase 6 ✅
-        └── ai.lua            ← Phase 8 ✅ (Agentic AI + Copilot)
+        ├── ai.lua            ← Phase 8 ✅ (Agentic AI + Copilot)
+        └── session.lua       ← Phase 10 ⬜ (Window Persistence)
 ```
 
 Each plugin file calls `vim.pack.add(...)` followed by `.setup()`.  
