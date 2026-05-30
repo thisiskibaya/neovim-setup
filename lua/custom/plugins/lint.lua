@@ -11,8 +11,8 @@ vim.pack.add {
 local lint = require 'lint'
 
 lint.linters_by_ft = {
-  cpp  = { 'clang-tidy' },
-  c    = { 'clang-tidy' },
+  cpp  = { 'clangtidy' },
+  c    = { 'clangtidy' },
   rust = { 'clippy' },
   go   = { 'staticcheck' },
   javascript = { 'eslint_d' },
