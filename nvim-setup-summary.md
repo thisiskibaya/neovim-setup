@@ -159,9 +159,19 @@ AI-assisted coding via `lua/custom/plugins/ai.lua` using the Copilot adapter. Re
 ### Quick Start
 
 1. `:Copilot auth` — authorize Copilot in your browser
-2. `<leader>ai` — open chat
-3. Type `@{agent} Add input validation to this form` — full agentic mode
-4. Or just ask a question like `Explain this file`
+2. If CodeCompanion reports "token not found" after auth, run:
+   ```bash
+   sqlite3 ~/.config/github-copilot/auth.db \
+     "SELECT oauth_token FROM oauth_tokens;" \
+     | head -1 \
+     | xargs -I{} sh -c \
+       'echo "{\"github.com\":{\"oauth_token\":\"{}\"}}" > ~/.config/github-copilot/hosts.json'
+   ```
+3. `<leader>ai` — open chat
+4. Type `@{agent} Add input validation to this form` — full agentic mode
+5. Or just ask a question like `Explain this file`
+
+**Why this is needed:** The Copilot LSP stores tokens in SQLite (`auth.db`) but CodeCompanion reads JSON (`hosts.json`). A Phase 9 improvement could automate this bridge.
 
 ---
 

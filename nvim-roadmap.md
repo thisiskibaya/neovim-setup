@@ -544,10 +544,10 @@ Tools that modify files (`create_file`, `delete_file`, `insert_edit_into_file`) 
 
 ### How to Use
 
-#### 1. Chat (`<leader>cc`)
+#### 1. Chat (`<leader>ai`)
 
 ```
-<leader>cc → type message → <C-Enter> to send
+<leader>ai → type message → <C-Enter> to send
 ```
 
 Use `@` for tools and context:
@@ -595,7 +595,17 @@ Built-in prompts: explain code, add docstrings, fix LSP errors, write tests, opt
 :checkhealth codecompanion
 ```
 
-After `:Copilot auth`, your browser will open to authorize GitHub Copilot. Once complete, `<leader>cc` will work immediately.
+After `:Copilot auth`, your browser will open to authorize GitHub Copilot. Once complete, `<leader>ai` will work immediately.
+
+**Note on token storage:** The Copilot LSP stores your OAuth token in an SQLite database (`~/.config/github-copilot/auth.db`). CodeCompanion's Copilot adapter reads from `hosts.json` (the VS Code format). If `:Copilot auth` succeeds but CodeCompanion reports "token not found", create `hosts.json` by extracting the token from `auth.db`:
+
+```bash
+sqlite3 ~/.config/github-copilot/auth.db "SELECT oauth_token FROM oauth_tokens;" \\
+  | head -1 \\
+  | xargs -I{} sh -c 'echo "{\"github.com\":{\"oauth_token\":\"{}\"}}" > ~/.config/github-copilot/hosts.json'
+```
+
+No restart needed — CodeCompanion reads the file on the next request.
 
 ### Troubleshooting
 
@@ -606,6 +616,75 @@ After `:Copilot auth`, your browser will open to authorize GitHub Copilot. Once 
 | `@{agent}` does nothing | Model doesn't support function calling | Ensure Copilot subscription is active |
 | `:Copilot auth` fails | No Copilot subscription | Check github.com/settings/copilot |
 | Slow git clone on setup | Large repo / slow network | Use `git clone --depth 1` for copilot.lua |
+| "Token not found" / auth fails | Copilot LSP stores token in `auth.db` but CodeCompanion reads `hosts.json` | Extract token from `auth.db` → `hosts.json` (see note above) |
+
+---
+
+## Phase 9 — Auth Bridge: `auth.db` → `hosts.json` (Planned)
+
+**Status**: ⬜ Planned
+
+**Goal**: Automate Copilot token extraction from the LSP's SQLite `auth.db` into the `hosts.json` format that CodeCompanion's Copilot adapter expects.
+
+### Problem
+
+The GitHub Copilot ecosystem has two token storage formats:
+
+| Format | File | Used by | Status |
+|---|---|---|---|
+| JSON | `~/.config/github-copilot/hosts.json` | VS Code, CodeCompanion, avante.nvim | ✅ CodeCompanion reads this |
+| JSON | `~/.config/github-copilot/apps.json` | Older copilot.lua versions | ⚠️ Fallback in CodeCompanion |
+| SQLite | `~/.config/github-copilot/auth.db` | Copilot LSP (Neovim built-in), copilot.lua v2+ | ❌ CodeCompanion cannot read this |
+
+When `:Copilot auth` runs, copilot.lua delegates to the Copilot LSP, which stores the token in `auth.db`. CodeCompanion's `token.lua` looks for `hosts.json` or `apps.json` — both JSON files that never get created by the LSP auth flow. The result: authentication succeeds but CodeCompanion can't find the token.
+
+### Current Workaround
+
+Manual extraction via `sqlite3`:
+
+```bash
+sqlite3 ~/.config/github-copilot/auth.db \
+  "SELECT oauth_token FROM oauth_tokens;" \
+  | head -1 \
+  | xargs -I{} sh -c \
+    'echo "{\"github.com\":{\"oauth_token\":\"{}\"}}" > ~/.config/github-copilot/hosts.json'
+```
+
+This works but is fragile: if the token is revoked or expires, there's no automated refresh.
+
+### Proposed Solution
+
+Create a small Neovim Lua module or CLI script that bridges the gap:
+
+**Option A: Neovim `token-bridge.lua` plugin file**
+- On `VimEnter` or when the Copilot adapter initializes, check if `hosts.json` exists
+- If not, check `auth.db` (via `vim.system` calling `sqlite3`)
+- If token found in `auth.db`, write `hosts.json` automatically
+- Optionally watch the file for changes / refresh on token expiry
+
+**Option B: Standalone shell script (`copilot-token-bridge`)**
+- Check if `auth.db` is newer than `hosts.json`
+- If so, re-extract the token
+- Can be run from cron or as a git hook
+
+**Option C: CodeCompanion adapter patch**
+- Contribute a PR to CodeCompanion's `token.lua` to add `auth.db` as a third token source
+- Parse SQLite via `vim.system({"sqlite3", path, "SELECT oauth_token FROM oauth_tokens"})`
+- No external file needed — read the token directly
+
+### Implementation Notes
+
+- SQLite query: `SELECT oauth_token FROM oauth_tokens WHERE token_type = 'oauth'` — returns the GitHub OAuth token
+- The `hosts.json` format is: `{"github.com": {"oauth_token": "<token>", "user": "<username>"}}`
+- Token expiry: The OAuth token itself is long-lived. The short-lived Copilot API token is obtained from the OAuth token via `GET https://api.github.com/copilot_internal/v2/token`
+- CodeCompanion already handles the OAuth → API token refresh internally once it has the OAuth token
+
+### Files to Modify
+
+| File | Change |
+|---|---|
+| `lua/custom/plugins/ai.lua` | Add auto-bridge on setup, or add a `:CopilotTokenBridge` command |
+| (or) submit upstream to `codecompanion.nvim` | Add `auth.db` support to `lua/codecompanion/adapters/http/copilot/token.lua` |
 
 ---
 
@@ -620,6 +699,7 @@ After `:Copilot auth`, your browser will open to authorize GitHub Copilot. Once 
 ✅ Phase 6  →  Productivity           (snippets, autopairs)
 ✅ Phase 7  →  Polish                 (noice, dressing, colorizer)
 ✅ Phase 8  →  Agentic AI             (CodeCompanion + Copilot)
+⬜ Phase 9  →  Auth Bridge            (automate token extraction auth.db → hosts.json)
 ```
 
 ---
