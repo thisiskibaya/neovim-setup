@@ -463,44 +463,149 @@ Both are active. Use whichever feels natural.
 
 **Status**: ✅ Implemented
 
-**Goal**: AI-assisted coding with chat, inline transformations, and agentic tools — using GitHub Copilot via CodeCompanion.
+**Goal**: AI-assisted coding with agentic tools, inline transformations, and autonomous agents — using GitHub Copilot via CodeCompanion.
+
+### Dependencies
+
+| Dependency | Role | Status |
+|---|---|---|
+| Neovim >= 0.10.0 | Runtime | ✅ v0.12.2 |
+| `plenary.nvim` | Async I/O, utilities | ✅ Installed |
+| `copilot.lua` | Copilot authentication & API bridge (inline suggestions disabled) | ✅ Installed |
+| GitHub Copilot subscription | API access | Required at github.com/settings/copilot |
+
+**Copilot adapter supports full tool use** ✅ — unlike the `github_models` adapter which is chat-only.
 
 ### Implementation
 
 Created `~/.config/nvim/lua/custom/plugins/ai.lua`.  
-Uses GitHub Copilot as the LLM adapter (zero API keys — reuses your existing GitHub auth).
+Auto-loaded via `lua/custom/plugins/init.lua` (the kickstart module loader).
+
+Full configuration:
+
+```lua
+require('copilot').setup {
+  suggestion = { enabled = false },  -- Chat only, no inline completions
+  panel = { enabled = false },
+}
+
+require('codecompanion').setup {
+  strategies = {
+    chat = { adapter = 'copilot' },    -- Full agentic tool support
+    inline = { adapter = 'copilot' },
+  },
+  display = {
+    chat = {
+      window = {
+        layout = 'vertical',   -- Right sidebar
+        width = 0.4,
+      },
+    },
+  },
+  opts = { log_level = 'INFO' },
+}
+```
 
 ### Plugins Installed
 
 | Plugin | Purpose | vim.pack Add |
 |---|---|---|
 | `olimorris/codecompanion.nvim` | AI chat, inline transformations, agentic tools | ✅ |
-| `nvim-lua/plenary.nvim` | Dependency for CodeCompanion | ✅ |
+| `zbirenbaum/copilot.lua` | Copilot auth & API bridge (required by copilot adapter) | ✅ |
+| `nvim-lua/plenary.nvim` | Async I/O and utility library (dependency) | ✅ |
 
-### Features
+### Agentic Features
 
-- **Chat buffer** (`<leader>cc`) — ask questions, refactor, explain code, generate tests
-- **Inline transformations** (`ga` in visual mode) — select code, describe the change, apply the diff
-- **Action palette** (`<leader>ce`) — built-in prompts: fix LSP errors, explain code, add docstrings
-- **Agent tools** — `@run_command` (execute terminal commands), `@files` (read/write project files), `@insert_edit_into_file`
-- **MCP support** — plug into external MCP servers for custom tools
-- **blink.cmp integration** — `@` completion in chat for context, tools, and slash commands
+| Feature | Trigger | Description |
+|---|---|---|
+| **Chat buffer** | `<leader>cc` | Right-side chat. Ask questions, request refactors, generate code. |
+| **Inline transformation** | `ga` (visual) | Select code, press `ga`, describe change. Accept diff with `<C-y>`. |
+| **Action palette** | `<leader>ce` | Built-in prompts: explain code, add docstrings, fix LSP errors, write tests. |
+| **Agent mode** | `@{agent}` in chat | Full autonomous agent with 10 tools. Reads/writes files, runs commands, greps, checks diagnostics, asks clarifying questions. |
+| **File tools** | `@{files}` in chat | Scaffold projects, read/edit/create files, grep search, git diff awareness. |
+| **Individual tools** | `@tool_name` | `@run_command`, `@insert_edit_into_file`, `@grep_search`, `@file_search`, `@read_file`, `@create_file`, `@delete_file`, `@get_diagnostics`, `@get_changed_files`, `@fetch_webpage`, `@memory` |
+| **Slash commands** | `/command` in chat | `/file`, `/buffer`, `/fetch` (URL), `/help`, `/symbols`, `/compact`, `/image`, `/mcp` |
+| **Editor context** | `#variable` | `#buffer` (current buffer), `#lsp` (LSP diagnostics), `#problems` (all diagnostics) |
+| **MCP servers** | Config | Connect external MCP servers (databases, APIs, etc.) for custom tools |
+| **blink.cmp** | `@` / `#` / `/` | Autocomplete for tools, context, and slash commands in chat buffer |
+
+### Tool Security
+
+Tools that modify files (`create_file`, `delete_file`, `insert_edit_into_file`) and run commands (`run_command`) require **user approval** by default. Approvals are tracked per-tool per-buffer. YOLO mode (`gty`) bypasses approval for non-destructive tools.
 
 ### Keymaps
 
 | Shortcut | Action | Mode |
 |---|---|---|
-| `<leader>cc` | Open chat buffer | Normal, Visual |
+| `<leader>cc` | Open chat buffer (right sidebar) | Normal, Visual |
 | `<leader>cC` | Open chat in vertical split | Normal, Visual |
-| `ga` | Inline transformation | Visual |
-| `<leader>ce` | Action palette | Normal |
+| `ga` | Inline AI transformation | Visual |
+| `<leader>ce` | Open action palette | Normal |
 
 ### How to Use
 
-1. **Chat**: `<leader>cc` opens a right-side chat buffer. Type your question or use `@` to tag files, tools, or context.
-2. **Inline**: Select code with `V` or `v`, then press `ga` and describe the change. Review the diff, accept or reject.
-3. **Actions**: `<leader>ce` opens the action palette — pick "Explain code", "Add docstrings", "Fix LSP diagnostics", etc.
-4. **Tools**: In chat, type `@run_command` to let the AI run terminal commands, or `@files` to read/write files.
+#### 1. Chat (`<leader>cc`)
+
+```
+<leader>cc → type message → <C-Enter> to send
+```
+
+Use `@` for tools and context:
+
+- `@{agent} Refactor the auth module to use JWT` — full autonomous agent
+- `@{files} Scaffold a new React component` — file operations
+- `@run_command Run npm test` — execute terminal commands
+- `@buffer` — include current buffer content
+- `@lsp` — include LSP diagnostics
+
+#### 2. Agent Mode (`@{agent}`)
+
+The most powerful feature. Include `@{agent}` in your prompt to give the LLM full agentic access:
+
+- Reads/writes/creates/deletes files
+- Runs shell commands (with approval)
+- Searches code with grep
+- Checks LSP diagnostics
+- Asks clarifying questions when stuck
+- Edits buffers with diff review
+
+Example: `@{agent} Add input validation to the signup form. Check for existing tests first.`
+
+#### 3. Inline (`ga`)
+
+1. Visually select code
+2. Press `ga`
+3. Describe the transformation
+4. Review the diff — `<C-y>` accept, `<C-x>` reject
+
+#### 4. Action Palette (`<leader>ce`)
+
+Built-in prompts: explain code, add docstrings, fix LSP errors, write tests, optimize code.
+
+### First-Time Setup
+
+```vim
+" 1. Install plugins (run inside Neovim)
+:lua vim.pack.update()
+
+" 2. Authenticate Copilot (opens browser)
+:Copilot auth
+
+" 3. Verify
+:checkhealth codecompanion
+```
+
+After `:Copilot auth`, your browser will open to authorize GitHub Copilot. Once complete, `<leader>cc` will work immediately.
+
+### Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| "Failed to set up adapter" | `copilot.lua` not loaded | Run `:lua vim.cmd.packadd('copilot.lua')` then restart |
+| No tools available (ghost menu) | Using wrong adapter | Only `copilot`, `anthropic`, `openai`, `gemini`, `deepseek`, `ollama` support tools |
+| `@{agent}` does nothing | Model doesn't support function calling | Ensure Copilot subscription is active |
+| `:Copilot auth` fails | No Copilot subscription | Check github.com/settings/copilot |
+| Slow git clone on setup | Large repo / slow network | Use `git clone --depth 1` for copilot.lua |
 
 ---
 
@@ -541,7 +646,7 @@ As phases accumulate, split `init.lua` into a modular structure:
         ├── lang-go.lua       ← Phase 5 ✅
         ├── lang-ts.lua       ← Phase 5 ⬜ (optional)
         ├── productivity.lua  ← Phase 6 ✅
-        └── ai.lua            ← Phase 8 ✅ (Agentic AI)
+        └── ai.lua            ← Phase 8 ✅ (Agentic AI + Copilot)
 ```
 
 Each plugin file calls `vim.pack.add(...)` followed by `.setup()`.  

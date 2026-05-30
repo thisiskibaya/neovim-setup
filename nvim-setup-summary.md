@@ -139,21 +139,29 @@ Async linters run automatically on every save via `lua/custom/plugins/lint.lua`:
 
 ## Agentic AI (CodeCompanion + Copilot)
 
-AI-assisted coding via `lua/custom/plugins/ai.lua` using GitHub Copilot as the adapter (zero API keys — reuses your existing GitHub auth).
+AI-assisted coding via `lua/custom/plugins/ai.lua` using the Copilot adapter. Requires `copilot.lua` for authentication (inline suggestions disabled — chat only).
+
+**Full agentic tool support** ✅ — the Copilot adapter supports function calling and agentic tools (`@run_command`, `@files`, `@{agent}`, etc.).
 
 ### Features
 
-- **Chat buffer** — ask questions, refactor, explain code, generate tests
-- **Inline transformations** (`ga` in visual mode) — select code, describe the change, apply the diff
-- **Action palette** (`<leader>ce`) — built-in prompts: fix LSP errors, explain code, add docstrings
-- **Agent tools** — `@run_command` (run terminal commands), `@files` (read/write files), `@insert_edit_into_file`
-- **blink.cmp integration** — `@` completion in chat for context, tools, and slash commands
+| Feature | Trigger | What it does |
+|---|---|---|
+| **Chat buffer** | `<leader>cc` | Right-side chat. Ask questions, refactor, generate code. |
+| **Agent mode** | `@{agent}` in chat | Autonomous agent: reads/writes files, runs commands, greps, checks diagnostics. |
+| **File tools** | `@{files}` | Scaffold, read, edit, create, delete files. |
+| **Inline transformation** | `ga` (visual) | Select code, describe change, apply diff. |
+| **Action palette** | `<leader>ce` | Built-in prompts: explain, fix, test, docstring. |
+| **Slash commands** | `/file`, `/buffer`, `/fetch` | Add context from files, buffers, URLs. |
+| **Tools** | `@tool_name` | `run_command`, `grep_search`, `insert_edit_into_file`, `memory`, `web_search`, etc. |
+| **MCP servers** | Configurable | Connect external MCP servers for custom tools. |
 
-### How to Use
+### Quick Start
 
-1. `<leader>cc` — open chat buffer, type questions or use `@` to tag context
-2. Visual select + `ga` — describe a code change, review diff, accept/reject
-3. `<leader>ce` — action palette for common AI tasks
+1. `:Copilot auth` — authorize Copilot in your browser
+2. `<leader>cc` — open chat
+3. Type `@{agent} Add input validation to this form` — full agentic mode
+4. Or just ask a question like `Explain this file`
 
 ---
 
