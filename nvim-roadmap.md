@@ -537,8 +537,8 @@ Tools that modify files (`create_file`, `delete_file`, `insert_edit_into_file`) 
 
 | Shortcut | Action | Mode |
 |---|---|---|
-| `<leader>cc` | Open chat buffer (right sidebar) | Normal, Visual |
-| `<leader>cC` | Open chat in vertical split | Normal, Visual |
+| `<leader>ai` | Open AI chat buffer (right sidebar) | Normal, Visual |
+| `<leader>aA` | Open AI chat in vertical split | Normal, Visual |
 | `ga` | Inline AI transformation | Visual |
 | `<leader>ce` | Open action palette | Normal |
 

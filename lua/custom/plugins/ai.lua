@@ -35,13 +35,13 @@ require('codecompanion').setup {
   },
 }
 
-vim.keymap.set({ 'n', 'v' }, '<leader>cc', function()
+vim.keymap.set({ 'n', 'v' }, '<leader>ai', function()
   require('codecompanion').chat({})
-end, { desc = 'Open CodeCompanion [C]hat' })
+end, { desc = 'Open CodeCompanion [A]I chat' })
 
-vim.keymap.set({ 'n', 'v' }, '<leader>cC', function()
+vim.keymap.set({ 'n', 'v' }, '<leader>aA', function()
   require('codecompanion').chat({ layout = 'vertical' })
-end, { desc = 'Open CodeCompanion chat in vertical split' })
+end, { desc = 'Open CodeCompanion AI chat vertical' })
 
 vim.keymap.set('v', 'ga', function()
   require('codecompanion').inline()

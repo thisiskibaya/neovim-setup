@@ -159,7 +159,7 @@ AI-assisted coding via `lua/custom/plugins/ai.lua` using the Copilot adapter. Re
 ### Quick Start
 
 1. `:Copilot auth` — authorize Copilot in your browser
-2. `<leader>cc` — open chat
+2. `<leader>ai` — open chat
 3. Type `@{agent} Add input validation to this form` — full agentic mode
 4. Or just ask a question like `Explain this file`
 
@@ -181,8 +181,8 @@ AI-assisted coding via `lua/custom/plugins/ai.lua` using the Copilot adapter. Re
 | `gra` | LSP code action |
 | `<leader>q` | Open diagnostics list |
 | `<C-h/j/k/l>` | Window navigation |
-| `<leader>cc` | Open AI chat | CodeCompanion |
-| `<leader>cC` | Open AI chat (vertical split) | CodeCompanion |
+| `<leader>ai` | Open AI chat | CodeCompanion |
+| `<leader>aA` | Open AI chat (vertical split) | CodeCompanion |
 | `ga` | Inline AI transformation (visual mode) | CodeCompanion |
 | `<leader>ce` | AI action palette | CodeCompanion |
 
