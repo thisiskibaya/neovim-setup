@@ -769,6 +769,12 @@ A new `lua/custom/plugins/session.lua` file would be added under the plugins dir
 
 ## Core Features
 
+### Mouse: Disabled
+
+Mouse is fully disabled (`vim.o.mouse = ''` in `init.lua:116`). Cursor only follows keyboard input — clicking in a buffer never moves the cursor. This matches classic Vim behavior and avoids accidental cursor jumps.
+
+To re-enable: `vim.o.mouse = 'a'` (all modes, cursor follows click) or `vim.o.mouse = 'n'` (normal mode only, click = cursor movement).
+
 ### Autocmd: Cursor Restore on File Open
 
 Neovim's built-in `'"` mark automatically tracks the last cursor position for every buffer across sessions. The autocmd below opts in to restoring it when a file is reopened.

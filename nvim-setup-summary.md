@@ -247,6 +247,20 @@ Requires a terminal restart to take effect.
 
 ---
 
+## Core Configuration
+
+### Mouse
+
+Mouse is **fully disabled** (`vim.o.mouse = ''` in `init.lua:116`). The cursor only follows keyboard input — clicking in a buffer never moves the cursor. This matches classic Vim behavior and avoids accidental cursor jumps.
+
+To re-enable: change `vim.o.mouse = ''` to `vim.o.mouse = 'a'` (all modes) or `vim.o.mouse = 'n'` (normal mode only, click = cursor follows but can still resize splits).
+
+### Autocmd: Cursor Restore
+
+On `BufReadPost`, the `'"` mark is used to restore the cursor to its last known position when reopening a file. No plugin needed — purely built-in. See `init.lua` for the implementation.
+
+---
+
 ## Symlink Setup
 
 This repo is symlinked to `~/.config/nvim` so the live config is always in sync:
